@@ -19,27 +19,29 @@
 
 extern "C"
 {
-#include <gst/gst.h>
-#include <gst/app/gstappsink.h>
+#include <vlc/vlc.h>
 }
 
+struct libvlc_instance_t;
+struct libvlc_media_t;
+struct libvlc_media_player_t;
 
-class GStreamerVideo : public IVideo
+class VLCVideo : public IVideo
 {
 public:
-    GStreamerVideo( int monitor );
-    ~GStreamerVideo();
-    bool initialize();
-    bool play(std::string file);
-    bool stop();
-    bool deInitialize();
-    SDL_Texture *getTexture() const;
-    void update(float dt);
-    void draw();
+    VLCVideo( int monitor );
+    ~VLCVideo();
     void setNumLoops(int n);
-    void freeElements();
+    SDL_Texture *getTexture() const;
+    bool initialize();
+    bool deInitialize();
+    bool stop();
+    bool play(std::string file);
+    //void freeElements();
     int getHeight();
     int getWidth();
+    void draw();
+    void update(float dt);
     bool isPlaying();
     void setVolume(float volume);
     void skipForward( );
@@ -53,19 +55,12 @@ public:
     bool isPaused( );
 
 private:
-    static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);
-    static gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
-
-    GstElement *playbin_;
-    GstElement *videoBin_;
-    GstElement *videoSink_;
-    GstElement *videoConvert_;
-    GstCaps *videoConvertCaps_;
-    GstBus *videoBus_;
+    static libvlc_instance_t*    VLC;
+    libvlc_media_t*              Media;
+    libvlc_media_player_t*       MediaPlayer;
     SDL_Texture* texture_;
-    gint height_;
-    gint width_;
-    GstBuffer *videoBuffer_;
+    int height_;
+    int width_;
     bool frameReady_;
     bool isPlaying_;
     static bool initialized_;
