@@ -18,7 +18,7 @@
 #include "../ViewInfo.h"
 #include "../../Database/Configuration.h"
 #include "../../Utility/Log.h"
-#include "../../Video/GStreamerVideo.h"
+#include "../../Video/VLCVideo.h"
 #include "../../Video/VideoFactory.h"
 #include "../../SDL.h"
 
@@ -48,7 +48,7 @@ void VideoComponent::update(float dt)
 {
     if (videoInst_)
     {
-        isPlaying_ = ((GStreamerVideo *)(videoInst_))->isPlaying();
+        isPlaying_ = ((VLCVideo *)(videoInst_))->isPlaying();
     }
     if(isPlaying_)
     {
