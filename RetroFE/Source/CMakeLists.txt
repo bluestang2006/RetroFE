@@ -29,8 +29,8 @@ endif()
 
 	set(ZLIB_ROOT "${RETROFE_THIRD_PARTY_DIR}/zlib128-dll")
 
-	set(GSTREAMER_ROOT "C:/gstreamer/1.0/x86" CACHE STRING "location of where your gstreamer include and lib folders reside")
-	set(GLIB2_ROOT "${GSTREAMER_ROOT}")
+	#set(GSTREAMER_ROOT "C:/gstreamer/1.0/x86" CACHE STRING "location of where your gstreamer include and lib folders reside")
+	set(GLIB2_ROOT "${VLC_ROOT}")
   
 if(MSVC)  
 	set(DIRENT_INCLUDE_DIR "${RETROFE_THIRD_PARTY_DIR}/dirent-1.20.1/include")
@@ -39,7 +39,7 @@ endif()
 
 if(WIN32)
 	find_package(Glib2 REQUIRED)
-	find_package(GStreamer REQUIRED)
+	find_package(VLC REQUIRED)
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
@@ -52,7 +52,7 @@ else()
 	pkg_search_module(SDL2_MIXER REQUIRED SDL2_mixer)
 	pkg_search_module(SDL2_TTF REQUIRED SDL2_ttf)
 	pkg_search_module(ZLIB REQUIRED zlib)
-	pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-video-1.0 gstreamer-audio-1.0)
+	pkg_check_modules(VLC REQUIRED libvlc)
 	pkg_check_modules(Glib2 REQUIRED glib-2.0 gobject-2.0 gthread-2.0 gmodule-2.0)
 	find_package(Threads REQUIRED)
 
@@ -62,9 +62,8 @@ endif()
 endif()
 
 set(RETROFE_INCLUDE_DIRS
-	"/usr/local/opt/gst-plugins-base/include/gstreamer-1.0"
 	"${GLIB2_INCLUDE_DIRS}"
-	"${GSTREAMER_INCLUDE_DIRS}"
+	"${VLC_INCLUDE_DIRS}"
 	"${SDL2_INCLUDE_DIRS}"
 	"${SDL2_IMAGE_INCLUDE_DIRS}"
 	"${SDL2_MIXER_INCLUDE_DIRS}"
@@ -80,7 +79,7 @@ endif()
 
 set(RETROFE_LIBRARIES
 	${GLIB2_LIBRARIES}
-	${GSTREAMER_LIBRARIES}
+	${VLC_LIBRARIES}
 	${SDL2_LIBRARIES}
 	${SDL2_IMAGE_LIBRARIES}
 	${SDL2_MIXER_LIBRARIES}
@@ -136,7 +135,7 @@ set(RETROFE_HEADERS
 	"${RETROFE_DIR}/Source/Utility/Log.h"
 	"${RETROFE_DIR}/Source/Utility/Utils.h"
 	"${RETROFE_DIR}/Source/Video/IVideo.h"
-	"${RETROFE_DIR}/Source/Video/GStreamerVideo.h"
+	"${RETROFE_DIR}/Source/Video/VLCVideo.h"
 	"${RETROFE_DIR}/Source/Video/VideoFactory.h"
 	"${RETROFE_DIR}/Source/Graphics/ComponentItemBindingBuilder.h"
 	"${RETROFE_DIR}/Source/Graphics/ViewInfo.h"
@@ -188,7 +187,7 @@ set(RETROFE_SOURCES
 	"${RETROFE_DIR}/Source/Sound/Sound.cpp"
 	"${RETROFE_DIR}/Source/Utility/Log.cpp"
 	"${RETROFE_DIR}/Source/Utility/Utils.cpp"
-	"${RETROFE_DIR}/Source/Video/GStreamerVideo.cpp"
+	"${RETROFE_DIR}/Source/Video/VLCVideo.cpp"
 	"${RETROFE_DIR}/Source/Video/VideoFactory.cpp"
 	"${RETROFE_DIR}/Source/Main.cpp"
 	"${RETROFE_DIR}/Source/RetroFE.cpp"
