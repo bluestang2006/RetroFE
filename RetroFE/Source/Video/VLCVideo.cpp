@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with RetroFE.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "GStreamerVideo.h"
+#include "VLCVideo.h"
 #include "../Graphics/ViewInfo.h"
 #include "../Graphics/Component/Image.h"
 #include "../Database/Configuration.h"
@@ -27,24 +27,16 @@
 #include <SDL2/SDL.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <gst/app/gstappsink.h>
-#include <gst/video/gstvideometa.h>
-#include <gst/video/video.h>
-#include <gst/audio/audio.h>
+#include <vlc/vlc.h>
 
-bool GStreamerVideo::initialized_ = false;
+bool VLCVideo::initialized_ = false;
 
-GStreamerVideo::GStreamerVideo( int monitor )
-    : playbin_(NULL)
-    , videoBin_(NULL)
-    , videoSink_(NULL)
-    , videoConvert_(NULL)
-    , videoConvertCaps_(NULL)
-    , videoBus_(NULL)
-    , texture_(NULL)
+libvlc_instance_t* VLCVideo::VLC = NULL;
+
+VLCVideo::VLCVideo( int monitor )
+    : texture_(NULL)
     , height_(0)
     , width_(0)
-    , videoBuffer_(NULL)
     , frameReady_(false)
     , isPlaying_(false)
     , playCount_(0)
@@ -55,25 +47,25 @@ GStreamerVideo::GStreamerVideo( int monitor )
 {
     paused_ = false;
 }
-GStreamerVideo::~GStreamerVideo()
+VLCVideo::~VLCVideo()
 {
     stop();
 }
 
-void GStreamerVideo::setNumLoops(int n)
+void VLCVideo::setNumLoops(int n)
 {
     if ( n > 0 )
         numLoops_ = n;
 }
 
-SDL_Texture *GStreamerVideo::getTexture() const
+SDL_Texture *VLCVideo::getTexture() const
 {
     return texture_;
 }
 
-void GStreamerVideo::processNewBuffer (GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
-{
-    GStreamerVideo *video = (GStreamerVideo *)userdata;
+//void VLCVideo::processNewBuffer (GstElement * /* fakesink /, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
+/*{
+    VLCVideo *video = (VLCVideo *)userdata;
 
     SDL_LockMutex(SDL::getMutex());
     if (!video->frameReady_ && video && video->isPlaying_)
@@ -94,22 +86,26 @@ void GStreamerVideo::processNewBuffer (GstElement * /* fakesink */, GstBuffer *b
         }
     }
     SDL_UnlockMutex(SDL::getMutex());
-}
+}*/
 
-
-bool GStreamerVideo::initialize()
+bool VLCVideo::initialize()
 {
     if(initialized_)
     {
         return true;
     }
 
-    std::string path = Utils::combinePath(Configuration::absolutePath, "Core");
-    gst_init(NULL, NULL);
+    const char** args;
+    const char* singleargs[] = { "--quiet" };
+    int argslen = 0;
+
+    argslen = sizeof(singleargs) / sizeof(singleargs[0]);
+    args = singleargs;
+    VLC = libvlc_new(argslen, args);
 
 #ifdef WIN32
-    GstRegistry *registry = gst_registry_get();
-    gst_registry_scan_path(registry, path.c_str());
+    //GstRegistry *registry = gst_registry_get();
+    //gst_registry_scan_path(registry, path.c_str());
 #endif
 
     initialized_ = true;
@@ -118,16 +114,27 @@ bool GStreamerVideo::initialize()
     return true;
 }
 
-bool GStreamerVideo::deInitialize()
+bool VLCVideo::deInitialize()
 {
-    gst_deinit();
+    if(MediaPlayer)
+    {
+        libvlc_media_player_release(MediaPlayer);
+        MediaPlayer = NULL;
+    }
+
+    if(Media)
+    {
+        libvlc_media_release(Media);
+        Media = NULL;
+    }
+
     initialized_ = false;
     paused_      = false;
     return true;
 }
 
 
-bool GStreamerVideo::stop()
+bool VLCVideo::stop()
 {
 
     paused_ = false;
@@ -137,14 +144,10 @@ bool GStreamerVideo::stop()
         return false;
     }
 
-    if(videoSink_)
+    if(MediaPlayer)
     {
-        g_object_set(G_OBJECT(videoSink_), "signal-handoffs", FALSE, NULL);
-    }
-
-    if(playbin_)
-    {
-        (void)gst_element_set_state(playbin_, GST_STATE_NULL);
+        libvlc_media_player_release(MediaPlayer);
+        MediaPlayer = NULL;
     }
 
     if(texture_)
@@ -152,14 +155,6 @@ bool GStreamerVideo::stop()
         SDL_DestroyTexture(texture_);
         texture_ = NULL;
     }
-
-    if(videoBuffer_)
-    {
-        gst_buffer_unref(videoBuffer_);
-        videoBuffer_ = NULL;
-    }
-
-    freeElements();
 
     isPlaying_ = false;
     height_ = 0;
@@ -169,7 +164,7 @@ bool GStreamerVideo::stop()
     return true;
 }
 
-bool GStreamerVideo::play(std::string file)
+bool VLCVideo::play(std::string file)
 {
 
     playCount_ = 0;
@@ -181,108 +176,33 @@ bool GStreamerVideo::play(std::string file)
 
     currentFile_ = file;
 
-    stop();
+    std::string path = Utils::combinePath(Configuration::absolutePath, "Core");
+    printf("DEBUG - %s\n", file.c_str());
+    Media = libvlc_media_new_path(VLC, file.c_str());
 
-    gchar *uriFile = gst_filename_to_uri (file.c_str(), NULL);
-    if(!uriFile)
+    if(Media)
     {
-        return false;
-    }
-    else
-    {
-        if(!playbin_)
+        //unsigned track_count;
+        libvlc_media_parse_with_options(Media, libvlc_media_parse_local , -1);
+        //libvlc_media_parse(Media);
+        //libvlc_media_track_t** tracks;
+        //track_count = libvlc_media_tracks_get(Media, &tracks);
+        //libvlc_media_tracks_release(tracks, track_count);
+        MediaPlayer = libvlc_media_player_new_from_media(Media);
+        if(libvlc_media_player_play(MediaPlayer) == -1)
         {
-            playbin_ = gst_element_factory_make("playbin", "player");
-            videoBin_ = gst_bin_new("SinkBin");
-            videoSink_  = gst_element_factory_make("fakesink", "video_sink");
-            videoConvert_  = gst_element_factory_make("capsfilter", "video_convert");
-            videoConvertCaps_ = gst_caps_from_string("video/x-raw,format=(string)I420,pixel-aspect-ratio=(fraction)1/1");
-            height_ = 0;
-            width_ = 0;
-            if(!playbin_)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not create playbin");
-                freeElements();
-                return false;
-            }
-            if(!videoSink_)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not create video sink");
-                freeElements();
-                return false;
-            }
-            if(!videoConvert_)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not create video converter");
-                freeElements();
-                return false;
-            }
-            if(!videoConvertCaps_)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not create video caps");
-                freeElements();
-                return false;
-            }
-
-            gst_bin_add_many(GST_BIN(videoBin_), videoConvert_, videoSink_, NULL);
-            gst_element_link_filtered(videoConvert_, videoSink_, videoConvertCaps_);
-            GstPad *videoConvertSinkPad = gst_element_get_static_pad(videoConvert_, "sink");
-
-            if(!videoConvertSinkPad)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not get video convert sink pad");
-                freeElements();
-                return false;
-            }
-
-            g_object_set(G_OBJECT(videoSink_), "sync", TRUE, "qos", FALSE, NULL);
-
-            GstPad *videoSinkPad = gst_ghost_pad_new("sink", videoConvertSinkPad);
-            if(!videoSinkPad)
-            {
-                Logger::write(Logger::ZONE_DEBUG, "Video", "Could not get video bin sink pad");
-                freeElements();
-                gst_object_unref(videoConvertSinkPad);
-                videoConvertSinkPad = NULL;
-                return false;
-            }
-
-            gst_element_add_pad(videoBin_, videoSinkPad);
-            gst_object_unref(videoConvertSinkPad);
-            videoConvertSinkPad = NULL;
-        }
-        g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, NULL);
-        g_free( uriFile );
-
-        isPlaying_ = true;
-
-
-        g_object_set(G_OBJECT(videoSink_), "signal-handoffs", TRUE, NULL);
-        g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
-
-        videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
-
-        /* Start playing */
-        GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
-        if (playState != GST_STATE_CHANGE_ASYNC)
-        {
-            isPlaying_ = false;
-            std::stringstream ss;
-            ss << "Unable to set the pipeline to the playing state: ";
-            ss << playState;
-            Logger::write(Logger::ZONE_ERROR, "Video", ss.str());
-            freeElements();
+            Logger::write( Logger::ZONE_INFO, "VLC", "Error - libvlc_media_player_play(MediaPlayer)" );
             return false;
         }
+        else
+            Logger::write( Logger::ZONE_INFO, "VLC", "Success - libvlc_media_player_play(MediaPlayer)" );
+        libvlc_video_set_callbacks(MediaPlayer, lock, unlock, display, (void*)&Context);
+        libvlc_video_set_format(MediaPlayer, "RGBA", VLC::getWidth(), VLC::getHeight(), VLC::getWidth() * 4);
     }
-
-    gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, 0.0 );
-    gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), true );
-
     return true;
 }
 
-void GStreamerVideo::freeElements()
+/*void VLCVideo::freeElements()
 {
     if(videoBus_)
     {
@@ -302,26 +222,26 @@ void GStreamerVideo::freeElements()
     videoSink_    = NULL;
     videoConvert_ = NULL;
     videoBin_     = NULL;
-}
+}*/
 
 
-int GStreamerVideo::getHeight()
+int VLCVideo::getHeight()
 {
     return static_cast<int>(height_);
 }
 
-int GStreamerVideo::getWidth()
+int VLCVideo::getWidth()
 {
     return static_cast<int>(width_);
 }
 
 
-void GStreamerVideo::draw()
+void VLCVideo::draw()
 {
     frameReady_ = false;
 }
 
-void GStreamerVideo::update(float /* dt */)
+void VLCVideo::update(float /* dt */)
 {
     SDL_LockMutex(SDL::getMutex());
     if(!texture_ && width_ != 0 && height_ != 0)
@@ -331,7 +251,7 @@ void GStreamerVideo::update(float /* dt */)
         SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
     }
 
-	if(playbin_)
+	/*if(playbin_)
 	{
 		if(volume_ > 1.0)
 			volume_ = 1.0;
@@ -438,151 +358,99 @@ void GStreamerVideo::update(float /* dt */)
 
             gst_message_unref(msg);
         }
-    }
+    }*/
     SDL_UnlockMutex(SDL::getMutex());
 }
 
 
-bool GStreamerVideo::isPlaying()
+bool VLCVideo::isPlaying()
 {
     return isPlaying_;
 }
 
 
-void GStreamerVideo::setVolume(float volume)
+void VLCVideo::setVolume(float volume)
 {
     volume_ = volume;
 }
 
 
-void GStreamerVideo::skipForward( )
+void VLCVideo::skipForward( )
 {
 
     if ( !isPlaying_ )
         return;
 
-    gint64 current;
-    gint64 duration;
-
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
-        return;
-
-    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
-        return;
-
-    current += 60 * GST_SECOND;
-    if ( current > duration )
-        current = duration-1;
-    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+    //
 
 }
 
-void GStreamerVideo::skipBackward( )
+void VLCVideo::skipBackward( )
 {
 
     if ( !isPlaying_ )
         return;
 
-    gint64 current;
-
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
-        return;
-
-    if ( current > 60 * GST_SECOND )
-        current -= 60 * GST_SECOND;
-    else
-        current = 0;
-    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+    //
 
 }
 
 
-void GStreamerVideo::skipForwardp( )
+void VLCVideo::skipForwardp( )
 {
 
     if ( !isPlaying_ )
         return;
 
-    gint64 current;
-    gint64 duration;
-
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
-        return;
-
-    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
-        return;
-
-    current += duration/20;
-    if ( current > duration )
-        current = duration-1;
-    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+    //
 
 }
 
-void GStreamerVideo::skipBackwardp( )
+void VLCVideo::skipBackwardp( )
 {
 
     if ( !isPlaying_ )
         return;
 
-    gint64 current;
-    gint64 duration;
-
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
-        return;
-
-    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
-        return;
-
-    if ( current > duration/20 )
-        current -= duration/20;
-    else
-        current = 0;
-    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+    //
 
 }
 
 
-void GStreamerVideo::pause( )
+void VLCVideo::pause( )
 {
     paused_ = !paused_;
-    if (paused_)
-        gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PAUSED);
-    else
-        gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+    return;
+
 }
 
 
-void GStreamerVideo::restart( )
+void VLCVideo::restart( )
 {
 
     if ( !isPlaying_ )
         return;
 
-    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), 0 );
+    //gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), 0 );
 
 }
 
 
-unsigned long long GStreamerVideo::getCurrent( )
+unsigned long long VLCVideo::getCurrent( )
 {
-    gint64 ret = 0;
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &ret ) || !isPlaying_ )
-        ret = 0;
+    int ret = 0;
     return (unsigned long long)ret;
 }
 
 
-unsigned long long GStreamerVideo::getDuration( )
+unsigned long long VLCVideo::getDuration( )
 {
-    gint64 ret = 0;
-    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &ret ) || !isPlaying_ )
-        ret = 0;
+    int ret = 0;
     return (unsigned long long)ret;
 }
 
 
-bool GStreamerVideo::isPaused( )
+bool VLCVideo::isPaused( )
 {
     return paused_;
 }
