@@ -85,7 +85,7 @@ std::string Utils::filterComments(std::string line)
 
 
 void Utils::populateCache(const std::filesystem::path& directory) {
-    Logger::write(Logger::ZONE_DEBUG, "File Cache", "Populating cache for directory: " + directory.string());
+    LOG_DEBUG("File Cache", "Populating cache for directory: " + directory.string());
 
     std::unordered_set<std::string>& files = fileCache[directory];
     for (const auto& entry : std::filesystem::directory_iterator(directory)) {
@@ -101,7 +101,7 @@ bool Utils::isFileInCache(const std::filesystem::path& baseDir, const std::strin
         const auto& files = baseDirIt->second;
         if (files.find(filename) != files.end()) {
             // Logging cache hit
-            Logger::write(Logger::ZONE_DEBUG, "File Cache", "Hit:  " + baseDir.string() + " contains " + filename);
+            LOG_DEBUG("File Cache", "Hit:  " + baseDir.string() + " contains " + filename);
             return true;
         }
     }
@@ -124,7 +124,7 @@ bool Utils::findMatchingFile(const std::string& prefix, const std::vector<std::s
 
         // Check if the directory is known to not exist
         if (nonExistingDirectories.find(baseDir) != nonExistingDirectories.end()) {
-            Logger::write(Logger::ZONE_DEBUG, "File Cache", "Skipping non-existing directory: " + baseDir.string());
+            LOG_DEBUG("File Cache", "Skipping non-existing directory: " + baseDir.string());
             return false; // Directory was previously found not to exist
         }
 
@@ -152,7 +152,7 @@ bool Utils::findMatchingFile(const std::string& prefix, const std::vector<std::s
 
         if (!foundInCache) {
             // Log cache miss only once per directory after checking all extensions
-            Logger::write(Logger::ZONE_DEBUG, "File Cache", "Miss: " + baseDir.string() + " does not contain file '" + baseFileName + "'");
+            LOG_DEBUG("File Cache", "Miss: " + baseDir.string() + " does not contain file '" + baseFileName + "'");
         }
 
         return foundInCache;

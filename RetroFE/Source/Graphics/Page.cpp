@@ -290,7 +290,7 @@ bool Page::addComponent(Component *c)
     {
         std::stringstream ss;
         ss << "Component layer too large Layer: " << c->baseViewInfo.Layer;
-        Logger::write(Logger::ZONE_ERROR, "Page", ss.str());
+        LOG_ERROR("Page", ss.str());
     }
 
     return retVal;
@@ -903,7 +903,7 @@ bool Page::pushCollection(CollectionInfo *collection)
         }
     }
     else {
-        Logger::write(Logger::ZONE_WARNING, "RetroFE", "layout.xml doesn't have any menus");
+        LOG_WARNING("RetroFE", "layout.xml doesn't have any menus");
     }
 
     // build the collection info instance
@@ -1423,7 +1423,7 @@ void Page::freeGraphicsMemory()
 
 void Page::allocateGraphicsMemory()
 {
-    Logger::write(Logger::ZONE_DEBUG, "Page", "Allocating graphics memory");
+    LOG_DEBUG("Page", "Allocating graphics memory");
 
     int currentDepth = 0;
     for (auto const& menuList : menus_)
@@ -1453,7 +1453,7 @@ void Page::allocateGraphicsMemory()
             component->allocateGraphicsMemory();
         }
     }
-    Logger::write(Logger::ZONE_DEBUG, "Page", "Allocate graphics memory complete");
+    LOG_DEBUG("Page", "Allocate graphics memory complete");
 }
 
 
