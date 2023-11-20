@@ -200,6 +200,7 @@ void RetroFE::launchExit( )
     input_.resetStates( );
     attract_.reset( );
     currentPage_->updateReloadables(0);
+    currentPage_->onNewItemSelected();
     currentPage_->reallocateMenuSpritePoints(false); // skip updating playlist menu
 
     // Restore time settings
