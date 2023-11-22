@@ -69,8 +69,10 @@ void Logger::write(Zone zone, std::string component, std::string message)
 bool Logger::isLevelEnabled(Zone zone) {
     if (!config_) return false; // do not log if log in settings.conf is not set
 
-    std::string level;
-    config_->getProperty("log", level);
+    static std::string level;
+    
+    if (level == "")
+        config_->getProperty("log", level);
 
     if (level == "ALL") return true;
 
