@@ -54,8 +54,6 @@ public:
     bool isPaused( );
 
 private:
-        
-    
     enum BufferLayout {
         UNKNOWN,        // Initial state
         CONTIGUOUS,     // Contiguous buffer layout

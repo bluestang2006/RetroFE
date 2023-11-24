@@ -336,20 +336,20 @@ void GStreamerVideo::processNewBuffer(GstElement const */* fakesink */, GstBuffe
 
         // If height and width are now set, and the video buffer hasn't been set yet, proceed.
         if (video->width_ > 0 && video->height_ > 0 && !video->videoBuffer_) {
-           // if (SDL_LockMutex(SDL::getMutex()) == 0) { // Lock the mutex, check for success.
+           if (SDL_LockMutex(SDL::getMutex()) == 0) { // Lock the mutex, check for success.
                 video->videoBuffer_ = gst_buffer_ref(buf);
                 if (!video->videoBuffer_) {
                     LOG_ERROR("Video", "Failed to ref buffer.");
-                    //SDL_UnlockMutex(SDL::getMutex());
+                    SDL_UnlockMutex(SDL::getMutex());
                     return; // Exit if buffer ref failed.
                 }
                 video->frameReady_ = true; // Set frame ready if all operations are successful.
-                //SDL_UnlockMutex(SDL::getMutex());
-           // }
-           // else {
-                //LOG_ERROR("Video", "Failed to lock mutex.");
-                //return;
-            //}
+                SDL_UnlockMutex(SDL::getMutex());
+            }
+            else {
+                LOG_ERROR("Video", "Failed to lock mutex.");
+                return;
+            }
         }
     }
 }
@@ -361,7 +361,7 @@ void GStreamerVideo::update(float /* dt */)
 		return;
 	}
 
-    //SDL_LockMutex(SDL::getMutex());
+    SDL_LockMutex(SDL::getMutex());
 
     if (!texture_ && width_ != 0) 
     {
@@ -398,7 +398,7 @@ void GStreamerVideo::update(float /* dt */)
         GstMapInfo bufInfo;
         if (!gst_buffer_map(videoBuffer_, &bufInfo, GST_MAP_READ))
         {
-            //SDL_UnlockMutex(SDL::getMutex());
+            SDL_UnlockMutex(SDL::getMutex());
             return; // Early exit if unable to map the buffer
         }
 
@@ -461,7 +461,7 @@ void GStreamerVideo::update(float /* dt */)
         gst_buffer_unref(videoBuffer_);
         videoBuffer_ = nullptr;
     }
-    //SDL_UnlockMutex(SDL::getMutex());
+    SDL_UnlockMutex(SDL::getMutex());
     volumeUpdate();
     loopHandler();
 }
