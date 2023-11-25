@@ -96,13 +96,12 @@ void Utils::populateCache(const std::filesystem::path& directory) {
 }
 
 bool Utils::isFileInCache(const std::filesystem::path& baseDir, const std::string& filename) {
-    std::string readablePath = removeAbsolutePath(baseDir.string());
     auto baseDirIt = fileCache.find(baseDir);
     if (baseDirIt != fileCache.end()) {
         const auto& files = baseDirIt->second;
         if (files.find(filename) != files.end()) {
             // Logging cache hit
-            LOG_DEBUG("File Cache", "Hit:  " + readablePath + " contains " + filename);
+            LOG_DEBUG("File Cache", "Hit:  " + removeAbsolutePath(baseDir.string()) + " contains " + filename);
             return true;
         }
     }
@@ -123,12 +122,9 @@ bool Utils::findMatchingFile(const std::string& prefix, const std::vector<std::s
         fs::path absolutePath = Configuration::convertToAbsolutePath(Configuration::absolutePath, prefix);
         fs::path baseDir = absolutePath.parent_path();
 
-        // Create a readable version of baseDir for logging
-        std::string readablePath = removeAbsolutePath(baseDir.string());
-
         // Check if the directory is known to not exist
         if (nonExistingDirectories.find(baseDir) != nonExistingDirectories.end()) {
-            LOG_DEBUG("File Cache", "Skipping non-existing directory: " + readablePath);
+            LOG_DEBUG("File Cache", "Skipping non-existing directory: " + removeAbsolutePath(baseDir.string()));
             return false; // Directory was previously found not to exist
         }
 
@@ -156,7 +152,7 @@ bool Utils::findMatchingFile(const std::string& prefix, const std::vector<std::s
 
         if (!foundInCache) {
             // Log cache miss only once per directory after checking all extensions
-            LOG_DEBUG("File Cache", "Miss: " + readablePath + " does not contain file '" + baseFileName + "'");
+            LOG_DEBUG("File Cache", "Miss: " + removeAbsolutePath(baseDir.string()) + " does not contain file '" + baseFileName + "'");
         }
 
         return foundInCache;
@@ -318,7 +314,7 @@ std::string Utils::removeAbsolutePath(const std::string& fullPath) {
 
     if (found != std::string::npos) {
         // Remove the rootPath part from fullPath
-        return fullPath.substr(0, found) + ".." + fullPath.substr(found + rootPath.length());
+        return fullPath.substr(0, found) + "." + fullPath.substr(found + rootPath.length());
     }
     return fullPath; // Return the original path if root is not found
 }
