@@ -27,7 +27,16 @@ Configuration* Logger::config_ = NULL;
 
 bool Logger::initialize(std::string file, Configuration* config)
 {
-    writeFileStream_.open(file.c_str());
+    // Open the log file in truncate mode to clear it, then switch to append mode
+    writeFileStream_.open(file.c_str(), std::ios::out | std::ios::trunc);
+    if (!writeFileStream_.is_open())
+    {
+        return false;
+    }
+
+    // Reopen the file in append mode for subsequent writes
+    writeFileStream_.close();
+    writeFileStream_.open(file.c_str(), std::ios::out | std::ios::app);
 
     cerrStream_ = std::cerr.rdbuf(writeFileStream_.rdbuf());
     coutStream_ = std::cout.rdbuf(writeFileStream_.rdbuf());
