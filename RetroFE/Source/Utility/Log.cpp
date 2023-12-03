@@ -73,6 +73,7 @@ bool Logger::isLevelEnabled(const std::string& zone) {
     static bool isNoticeEnabled = false;
     static bool isWarningEnabled = false;
     static bool isErrorEnabled = false;
+	static bool isFileCacheEnabled = false;
     static std::string level;
 
     if (!config_) return false;
@@ -89,8 +90,9 @@ bool Logger::isLevelEnabled(const std::string& zone) {
             else if (token == "NOTICE") isNoticeEnabled = true;
             else if (token == "WARNING") isWarningEnabled = true;
             else if (token == "ERROR") isErrorEnabled = true;
+			else if (token == "FILECACHE") isFileCacheEnabled = true;
             else if (token == "ALL") {
-                isDebugEnabled = isInfoEnabled = isNoticeEnabled = isWarningEnabled = isErrorEnabled = true;
+                isDebugEnabled = isInfoEnabled = isNoticeEnabled = isWarningEnabled = isErrorEnabled = isFileCacheEnabled = true;
                 break;
             }
         }
@@ -101,6 +103,7 @@ bool Logger::isLevelEnabled(const std::string& zone) {
     else if (zone == "NOTICE") return isNoticeEnabled;
     else if (zone == "WARNING") return isWarningEnabled;
     else if (zone == "ERROR") return isErrorEnabled;
+    else if (zone == "FILECACHE") return isFileCacheEnabled;
 
     return false;
 }
@@ -119,6 +122,8 @@ std::string Logger::zoneToString(Zone zone)
         return "WARNING";
     case ZONE_ERROR:
         return "ERROR";
+    case ZONE_FILECACHE:
+		return "FILECACHE";
     default:
         return "UNKNOWN";
     }
