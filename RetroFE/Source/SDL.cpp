@@ -276,8 +276,12 @@ bool SDL::initialize( Configuration &config )
             else
             {
                 if (screenNum == mainScreen) {
-                    // Move the mouse to the top right corner of the primary window
-                    SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum], 0);
+                    // Centre mouse in primary window
+                    SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum] / 2, windowHeight_[screenNum] / 2 );
+                    // If on MacOS enable relative mouse mode
+                    #ifdef __APPLE__
+                        SDL_SetRelativeMouseMode(SDL_TRUE);
+                    #endif
                 }
                 bool vSync = false;
 				config.getProperty("vSync", vSync);
@@ -357,9 +361,12 @@ bool SDL::deInitialize( )
     LOG_INFO("SDL", "DeInitializing" );
 
     if (window_[0] != NULL) {
-        int windowCenterX = windowWidth_[0] / 2;
-        int windowCenterY = windowHeight_[0] / 2;
-        SDL_WarpMouseInWindow(window_[0], windowCenterX, windowCenterY);
+        // If on MacOS disable relative mouse mode
+        #ifdef __APPLE__
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+        #endif
+        // Centre mouse in primary window
+        SDL_WarpMouseInWindow(window_[0], windowWidth_[0] / 2, windowHeight_[0] / 2);
     }
     else {
         LOG_WARNING("SDL", "Window 0 is NULL, cannot center mouse within it");
