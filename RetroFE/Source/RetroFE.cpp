@@ -175,13 +175,9 @@ void RetroFE::launchEnter( )
     #endif
 
     bool hideMouse = false;
-    int  mouseX    = 960;
-    int  mouseY    = 500;
     config_.getProperty( "hideMouse", hideMouse );
-    config_.getProperty( "mouseX",    mouseX );
-    config_.getProperty( "mouseY",    mouseY );
     if ( hideMouse )
-        SDL_WarpMouseGlobal( mouseX, mouseY );
+        SDL_WarpMouseGlobal(SDL::getWindowWidth(0) / 2 , SDL::getWindowHeight(0) / 2 );
     #ifdef WIN32
             Utils::postMessage("MediaplayerHiddenWindow",0x8001, 75, 0);
     #endif
@@ -220,13 +216,9 @@ void RetroFE::launchExit( )
     lastLaunchReturnTime_ = currentTime_;
 
     bool hideMouse = false;
-    int  mouseX    = 960;
-    int  mouseY    = 500;
     config_.getProperty( "hideMouse", hideMouse );
-    config_.getProperty( "mouseX",    mouseX );
-    config_.getProperty( "mouseY",    mouseY );
     if ( hideMouse )
-        SDL_WarpMouseGlobal( mouseX, mouseY );
+        SDL_WarpMouseGlobal(SDL::getWindowWidth(0) / 2 , SDL::getWindowHeight(0) / 2 );
     #ifdef WIN32
                 Utils::postMessage("MediaplayerHiddenWindow",0x8001, 76, 0);
     #endif
