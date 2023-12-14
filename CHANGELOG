@@ -44,6 +44,10 @@ v0.10.34.3
     - fixed toggling close the info upon going to settings; fixed toggling back to last from settings in different collection (monkofhefunk)
     - fixed random start playlist to exclude favorites and lastplayed (monkofthefunk)
     - added ability to have ..: blank playlist to allow for multiple playlists in global setting toggle, uses autoPlaylist and cyclePlaylist in setting collection (monkofthefunk)
+    - fixed mouse handling and fullscreen on MacOS (aidenjbass)
+    - added ability to build Universal2 binaries on MacOS via xcodeproj (aidenjbass)
+    - changed mouse warp to resolution extremes in favour of relativemousemode (aidenjbass)
+    - removed mouseX and mouseY from config (aidenjbass)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)
