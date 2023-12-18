@@ -276,10 +276,13 @@ bool SDL::initialize( Configuration &config )
             else
             {
                 if (screenNum == mainScreen) {
-                    // Centre mouse in primary window
-                    SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum] / 2, windowHeight_[screenNum] / 2 );
-                    // If on MacOS enable relative mouse mode
+                    #ifndef __APPLE__
+                        // If not MacOS, warp cursor top right
+                        SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum], 0 );
+                    #endif
                     #ifdef __APPLE__
+                        // If MacOS, warp cursor to center to prevent hot corner activation
+                        SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum] / 2, windowHeight_[screenNum] /2 );
                         SDL_SetRelativeMouseMode(SDL_TRUE);
                     #endif
                 }
@@ -365,7 +368,7 @@ bool SDL::deInitialize( )
         #ifdef __APPLE__
             SDL_SetRelativeMouseMode(SDL_FALSE);
         #endif
-        // Centre mouse in primary window
+        // Center mouse in primary window
         SDL_WarpMouseInWindow(window_[0], windowWidth_[0] / 2, windowHeight_[0] / 2);
     }
     else {
