@@ -11,7 +11,8 @@ It's licensed under the terms of the GNU General Public License, version 3 or la
 ## What's so special about this fork?
 * Performance and optimisations
 	* 64bit codebase
-	* Updated render engine; DX11 for Windows and Linux, Metal for MacOS
+	* Modern render engine; DX11 for Windows, Metal for MacOS
+ 	* Hardware accelerated video support for Windows and MacOS 
 	* VSync and support for high refresh rate
 	* Metadata database build time reduced
 	* File caching to prevent drive lashing
