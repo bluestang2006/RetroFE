@@ -1,4 +1,4 @@
-# RetroFE - A cross-platform frontend for MAME cabinets and game centers
+# RetroFE - A cross-platform frontend for MAME cabinets
 
 [Project Discord](https://discord.gg/dpcsP8Hm9W) | [GitHub Wiki](https://github.com/CoinOPS-Official/RetroFE/wiki) | [Changelog](CHANGELOG.md)
 
@@ -8,11 +8,29 @@ It is designed for use within CoinOPS builds, bringing with it a significant inc
 
 It's licensed under the terms of the GNU General Public License, version 3 or later (GPLv3).
 
+## What's so special about this fork?
+* Performance and optimisations
+	* 64bit codebase
+	* Updated render engine; DX11 for Windows and Linux, Metal for MacOS
+	* VSync and support for high refresh rate
+	* Metadata database build time reduced
+	* File caching to prevent drive lashing
+	* RAM usage reduced by 70%
+* Features
+	* Ability to start on random item; fed up of seeing the same game every time?
+	* Upgraded attract mode
+	* Upgraded favouriting system; global and local favourites
+	* Start and exit scripts; run programs such as steam at retrofe launch
+	* In depth logging system; 7 logging levels
+	* Kiosk mode; lock things down for kids or cleanliness
+	* And much more!
+
 ## System Requirements
 * OS
     * Windows (10 or higher)
     * Linux
     * macOS (11 Big Sur or higher)
+	* Unix-like systems other than Linux are not officially supported but may work
 * Processor
     * A modern CPU (2014 or later) is highly recommended
 * Graphics
