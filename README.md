@@ -102,6 +102,7 @@ Download the following .dmg and place all .framework's in `RetroFE/ThirdPartyMac
 * Install Gstreamer (https://gstreamer.freedesktop.org/download/#macos)
 * * For Gstreamer both runtime and dev packages are needed, they are installed to `Macintosh HD/Library/Frameworks` and should be moved to `RetroFE/ThirdPartyMac`
 
+### Download and compile the source code
 Download the source code
 
 	git clone https://github.com/CoinOPS-Official/RetroFE.git
@@ -110,6 +111,7 @@ Open the Xcodeproj in `RetroFE/xcode` and build target
 
 ## Single Architecture Binary
 
+### Install libraries
 A binary supporting a single architecture can be built using [homebrew](https://brew.sh)
 
     brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf gstreamer
@@ -119,7 +121,7 @@ Download the source code
 
 	git clone https://github.com/CoinOPS-Official/RetroFE.git
 
-Generate your gcc make files
+Generate your clang files
 
 	cd retrofe
 	cmake RetroFE/Source -BRetroFE/Build
