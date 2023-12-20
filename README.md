@@ -18,6 +18,7 @@ It's licensed under the terms of the GNU General Public License, version 3 or la
 	* RAM usage reduced by 70%
 * Features
 	* Ability to start on random item; fed up of seeing the same game every time?
+ 	* Robust video marquee and 2nd screen support	 
 	* Upgraded attract mode
 	* Upgraded favouriting system; global and local favourites
 	* Start and exit scripts; run programs such as steam at retrofe launch
