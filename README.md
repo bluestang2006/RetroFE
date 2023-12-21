@@ -12,7 +12,7 @@ It's licensed under the terms of the GNU General Public License, version 3 or la
 * Performance and optimisations
 	* 64bit codebase
 	* Modern render engine; DX11 for Windows, Metal for MacOS
- 	* Hardware accelerated video support for Windows and MacOS 
+ 	* Hardware accelerated video support for Windows
 	* VSync and support for high refresh rate
 	* Metadata database build time reduced
 	* File caching to prevent drive lashing
