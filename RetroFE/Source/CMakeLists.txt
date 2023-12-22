@@ -205,7 +205,7 @@ set(LIBRARY_OUTPUT_PATH "${RETROFE_DIR}/Build" CACHE PATH "Build directory" FORC
 include_directories(${RETROFE_INCLUDE_DIRS})
 add_executable(retrofe  ${RETROFE_SOURCES} ${RETROFE_HEADERS})
 
-if(WIN32)
+if(NOT APPLE)
 	target_link_libraries(retrofe ${RETROFE_LIBRARIES})
 endif()
 
