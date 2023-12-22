@@ -150,8 +150,10 @@ bool MetadataDatabase::importDirectory()
 void MetadataDatabase::injectMetadata(CollectionInfo* collection)
 {
     sqlite3* handle = db_.handle;
+    int rc;
     sqlite3_stmt* stmt;
 
+    // items into a hash to make it easily searchable
     std::vector<Item*> const* items = &collection->items;
     std::map<std::string, Item*, std::less<>> itemMap;
 
@@ -159,52 +161,54 @@ void MetadataDatabase::injectMetadata(CollectionInfo* collection)
         itemMap.try_emplace(item->name, item);
     }
 
-    // Prepare SQL query - ensure this query is optimized and uses appropriate indexing
-    const char* sql = "SELECT DISTINCT Meta.name, Meta.title, Meta.year, Meta.manufacturer, Meta.developer, Meta.genre, Meta.players, Meta.ctrltype, Meta.buttons, Meta.joyways, Meta.cloneOf, Meta.rating, Meta.score "
-        "FROM Meta WHERE collectionName=? ORDER BY title ASC;";
-
-    if (sqlite3_prepare_v2(handle, sql, -1, &stmt, nullptr) != SQLITE_OK) {
-        std::stringstream ss;
-        ss << "Error in injectMetadata: Failed to prepare SQL statement. SQL Error: " << sqlite3_errmsg(handle);
-        LOG_ERROR("Metadata", ss.str());
-        return;
-    }
+    //todo: program crashes if this query fails
+    sqlite3_prepare_v2(handle,
+        "SELECT DISTINCT Meta.name, Meta.title, Meta.year, Meta.manufacturer, Meta.developer, Meta.genre, Meta.players, Meta.ctrltype, Meta.buttons, Meta.joyways, Meta.cloneOf, Meta.rating, Meta.score "
+        "FROM Meta WHERE collectionName=? ORDER BY title ASC;",
+        -1, &stmt, nullptr);
 
     sqlite3_bind_text(stmt, 1, collection->metadataType.c_str(), -1, SQLITE_TRANSIENT);
 
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        // Directly use the C-style strings for comparison and assignment to avoid unnecessary conversions
-        const char* name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+    rc = sqlite3_step(stmt);
 
-        if (auto it = itemMap.find(name); it != itemMap.end())
+    while (rc == SQLITE_ROW)
+    {
+        std::string name = (const char*)sqlite3_column_text(stmt, 0);
+        std::string fullTitle = (const char*)sqlite3_column_text(stmt, 1);
+        std::string year = (const char*)sqlite3_column_text(stmt, 2);
+        std::string manufacturer = (const char*)sqlite3_column_text(stmt, 3);
+        std::string developer = (const char*)sqlite3_column_text(stmt, 4);
+        std::string genre = (const char*)sqlite3_column_text(stmt, 5);
+        std::string numberPlayers = (const char*)sqlite3_column_text(stmt, 6);
+        std::string ctrlType = (const char*)sqlite3_column_text(stmt, 7);
+        std::string numberButtons = (const char*)sqlite3_column_text(stmt, 8);
+        std::string joyWays = (const char*)sqlite3_column_text(stmt, 9);
+        std::string cloneOf = (const char*)sqlite3_column_text(stmt, 10);
+        std::string rating = (const char*)sqlite3_column_text(stmt, 11);
+        std::string score = (const char*)sqlite3_column_text(stmt, 12);
+        std::string launcher;
+        std::string title = fullTitle;
+
+
+        if (std::map<std::string, Item*>::iterator it = itemMap.find(name); it != itemMap.end())
         {
             Item* item = it->second;
-
-            // Directly assign the C-style strings from the SQLite columns to the corresponding fields in the Item object.
-            // reinterpret_cast is used to convert the void pointer returned by sqlite3_column_text to a const char pointer.
-            item->title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            item->year = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-            item->manufacturer = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-            item->developer = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
-            item->genre = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
-            item->numberPlayers = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
-            item->ctrlType = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 7));
-            item->numberButtons = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8));
-            item->joyWays = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
-            item->cloneof = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
-            item->rating = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11));
-            item->score = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12));
+            item->title = title;
+            item->fullTitle = fullTitle;
+            item->year = year;
+            item->manufacturer = manufacturer;
+            item->developer = developer;
+            item->genre = genre;
+            item->numberPlayers = numberPlayers;
+            item->numberButtons = numberButtons;
+            item->ctrlType = ctrlType;
+            item->joyWays = joyWays;
+            item->cloneof = cloneOf;
+            item->rating = rating;
+            item->score = score;
         }
+        rc = sqlite3_step(stmt);
     }
-
-    // Check for errors in the while loop, log and handle appropriately
-    if (sqlite3_errcode(handle) != SQLITE_DONE) {
-        std::stringstream ss;
-        ss << "Error in injectMetadata: SQLite operation did not complete successfully. Error code: " << sqlite3_errcode(handle) << "; Error message: " << sqlite3_errmsg(handle);
-        LOG_ERROR("Metadata", ss.str());
-    }
-
     sqlite3_finalize(stmt);
 }
 
