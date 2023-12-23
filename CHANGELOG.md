@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - random highlight on first playlist scroll if randomStart [@monkofthefunk](https://github.com/monkofthefunk)
 - ability to have ..: blank playlist to allow for multiple playlists in global setting toggle, uses autoPlaylist and cyclePlaylist in setting collection [@monkofthefunk](https://github.com/monkofthefunk)
 - implemented file cache [@inigomontoya](https://github.com/inigomontoya)
+- configurable quitCombo in controls.conf, example quitCombo = joyButton6,joyButton7 [@inigomontoya](https://github.com/inigomontoya)
+- ability for collections to have their own launcher within the folder; also a menu collection can have a setting "menuFromCollectionLaunchers=true" to build menu based off of collections with launcher.conf [@monkofthefunk](https://github.com/monkofthefunk)
+- access to selected collection's art via mode="system" on relodables [@monkofthefunk](https://github.com/monkofthefunk)
 
 ### Changed
 - changed video pause/restart behavior, also videos will now pause by default if out of view, disablePauseOnScroll=true in settings.conf for global override. [@inigomontoya](https://github.com/inigomontoya)
