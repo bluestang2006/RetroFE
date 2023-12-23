@@ -168,18 +168,17 @@ void RetroFE::launchEnter( )
     SDL_SetWindowGrab(SDL::getWindow( 0 ), SDL_FALSE);
     // Free the textures, and optionally take down SDL
     //freeGraphicsMemory();
+    
+    // If on MacOS disable relative mouse mode to handoff mouse to game/program
+    #ifdef __APPLE__
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+    #endif
+    
+    #ifdef WIN32
+            Utils::postMessage("MediaplayerHiddenWindow",0x8001, 75, 0);
+    #endif
 
-    bool hideMouse = false;
-    int  mouseX    = 5000;
-    int  mouseY    = 5000;
-    config_.getProperty( "hideMouse", hideMouse );
-    config_.getProperty( "mouseX",    mouseX );
-    config_.getProperty( "mouseY",    mouseY );
-    if ( hideMouse )
-        SDL_WarpMouseGlobal( mouseX, mouseY );
-#ifdef WIN32            
-        Utils::postMessage("MediaplayerHiddenWindow",0x8001, 75, 0);		
-#endif		
+
 }
 
 
@@ -214,17 +213,18 @@ void RetroFE::launchExit( )
     keyLastTime_ = currentTime_;
     lastLaunchReturnTime_ = currentTime_;
 
-    bool hideMouse = false;
-    int  mouseX    = 5000;
-    int  mouseY    = 5000;
-    config_.getProperty( "hideMouse", hideMouse );
-    config_.getProperty( "mouseX",    mouseX );
-    config_.getProperty( "mouseY",    mouseY );
-    if ( hideMouse )
-        SDL_WarpMouseGlobal( mouseX, mouseY );
-#ifdef WIN32            
-			Utils::postMessage("MediaplayerHiddenWindow",0x8001, 76, 0);		
-#endif			
+    #ifndef __APPLE__
+        // If not MacOS, warp cursor top right. game/program may warp elsewhere
+        SDL_WarpMouseInWindow(window_[screenNum], windowWidth_[screenNum], 0 );
+    #endif
+    
+    #ifdef WIN32
+                Utils::postMessage("MediaplayerHiddenWindow",0x8001, 76, 0);
+    #endif
+    // If on MacOS enable relative mouse mode
+    #ifdef __APPLE__
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    #endif
 }
 
 

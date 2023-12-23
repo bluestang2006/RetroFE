@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - configurable quitCombo in controls.conf, example quitCombo = joyButton6,joyButton7 [@inigomontoya](https://github.com/inigomontoya)
 - ability for collections to have their own launcher within the folder; also a menu collection can have a setting "menuFromCollectionLaunchers=true" to build menu based off of collections with launcher.conf [@monkofthefunk](https://github.com/monkofthefunk)
 - access to selected collection's art via mode="system" on relodables [@monkofthefunk](https://github.com/monkofthefunk)
+- ability to build Universal2 binaries on MacOS via xcodeproj [@aidenjbass](https://github.com/aidenjbass)
 
 ### Changed
 - changed video pause/restart behavior, also videos will now pause by default if out of view, disablePauseOnScroll=true in settings.conf for global override. [@inigomontoya](https://github.com/inigomontoya)
@@ -46,6 +47,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - early initialization of gstreamer on launch instead of when first video plays [@inigomontoya](https://github.com/inigomontoya)
 - removed dependency on dirent.h [@inigomontoya](https://github.com/inigomontoya)
 - reworked xml metadata import function, should be quicker [@inigomontoya](https://github.com/inigomontoya)
+- changed mouse warp to resolution extremes in favour of relativemousemode [@aidenjbass](https://github.com/aidenjbass)
+- removed mouseX and mouseY from config [@aidenjbass](https://github.com/aidenjbass)
 
 
 ### Fixed
@@ -74,6 +77,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - setting jump blip when within same collection; while not breaking menu reload upon new collection [@monkofthefunk](https://github.com/monkofthefunk)
 - toggling close the info upon going to settings; fixed toggling back to last from settings in different collection [@monkofthefunk](https://github.com/monkofthefunk)
 - random start playlist to exclude favorites and lastplayed [@monkofthefunk](https://github.com/monkofthefunk)
+- mouse handling and fullscreen on MacOS [@aidenjbass](https://github.com/aidenjbass)
  
 ## [10.34.2] - 2023-06-29
 
