@@ -223,6 +223,7 @@ std::string Launcher::replaceVariables(std::string str,
     str = Utils::replace(str, "%ITEM_DIRECTORY%", itemDirectory);
     str = Utils::replace(str, "%ITEM_COLLECTION_NAME%", itemCollectionName);
     str = Utils::replace(str, "%RETROFE_PATH%", Configuration::absolutePath);
+    str = Utils::replace(str, "%COLLECTION_PATH%", Utils::combinePath(Configuration::absolutePath, "collections", itemCollectionName));
 #ifdef WIN32
     str = Utils::replace(str, "%RETROFE_EXEC_PATH%", Utils::combinePath(Configuration::absolutePath, "retrofe", "RetroFE.exe"));
     const char* comspec = std::getenv("COMSPEC");
