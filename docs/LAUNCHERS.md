@@ -43,6 +43,7 @@ Launcher variables
 | %ITEM_COLLECTION_NAME% | Name of collection for item | Nintendo Entertainment System         |
 | %RETROFE_PATH%         | Folder location of Frontend | D:/Frontends/RetroFE                  |
 | %RETROFE_EXEC_PATH%    | Location of RetroFE         | D:/Frontends/RetroFE/RetroFE.exe      |
+| %COLLECTION_PATH%      | Full path to collection     | D:/Frontends/collections/Genesis      |
 
 More elaborate example:
 
