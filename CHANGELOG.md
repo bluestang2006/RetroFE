@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - ability for collections to have their own launcher within the folder; also a menu collection can have a setting "menuFromCollectionLaunchers=true" to build menu based off of collections with launcher.conf [@monkofthefunk](https://github.com/monkofthefunk)
 - access to selected collection's art via mode="system" on relodables [@monkofthefunk](https://github.com/monkofthefunk)
 - ability to build Universal2 binaries on MacOS via xcodeproj [@aidenjbass](https://github.com/aidenjbass)
+- added %COLLECTION_PATH% to launchers, resolves to full path to collection
 
 ### Changed
 - changed video pause/restart behavior, also videos will now pause by default if out of view, disablePauseOnScroll=true in settings.conf for global override. [@inigomontoya](https://github.com/inigomontoya)
