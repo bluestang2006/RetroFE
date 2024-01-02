@@ -17,3 +17,4 @@ BP Files/RetroFE.cpp
 .DS_Store
 .vscode/settings.json
 RetroFE/ThirdPartyMac/*
+RetroFE/xcode/CMakeFiles/3.27.8/*

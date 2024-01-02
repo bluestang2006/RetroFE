@@ -585,6 +585,7 @@
 					../ThirdPartyMac/GStreamer.framework/Headers,
 				);
 				INFOPLIST_FILE = /Users/aiden/Documents/Github/RetroFE/RetroFE/xcode/CMakeFiles/retrofe.dir/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetroFE;
 				LD_DYLIB_INSTALL_NAME = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks/GStreamer.framework/Libraries",
@@ -594,7 +595,7 @@
 					"$(inherited)",
 					../ThirdPartyMac/GStreamer.framework/Libraries,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 0.10.34.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -664,6 +665,7 @@
 					../ThirdPartyMac/GStreamer.framework/Headers,
 				);
 				INFOPLIST_FILE = /Users/aiden/Documents/Github/RetroFE/RetroFE/xcode/CMakeFiles/retrofe.dir/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetroFE;
 				LD_DYLIB_INSTALL_NAME = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks/GStreamer.framework/Libraries",
@@ -673,7 +675,7 @@
 					"$(inherited)",
 					../ThirdPartyMac/GStreamer.framework/Libraries,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 0.10.34.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -743,6 +745,7 @@
 					../ThirdPartyMac/GStreamer.framework/Headers,
 				);
 				INFOPLIST_FILE = /Users/aiden/Documents/Github/RetroFE/RetroFE/xcode/CMakeFiles/retrofe.dir/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetroFE;
 				LD_DYLIB_INSTALL_NAME = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks/GStreamer.framework/Libraries",
@@ -752,7 +755,7 @@
 					"$(inherited)",
 					../ThirdPartyMac/GStreamer.framework/Libraries,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 0.10.34.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -852,6 +855,7 @@
 					../ThirdPartyMac/GStreamer.framework/Headers,
 				);
 				INFOPLIST_FILE = /Users/aiden/Documents/Github/RetroFE/RetroFE/xcode/CMakeFiles/retrofe.dir/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetroFE;
 				LD_DYLIB_INSTALL_NAME = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks/GStreamer.framework/Libraries",
@@ -861,7 +865,7 @@
 					"$(inherited)",
 					../ThirdPartyMac/GStreamer.framework/Libraries,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 0.10.34.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
