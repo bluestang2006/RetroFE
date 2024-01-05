@@ -166,9 +166,13 @@ void RetroFE::launchEnter( )
 
     // Disable window focus
     SDL_SetWindowGrab(SDL::getWindow( 0 ), SDL_FALSE);
-    // Free the textures, and optionally take down SDL
-    //freeGraphicsMemory();
-    
+    // Free the textures, and take down SDL if unloadSDL flag is set
+    bool unloadSDL = false;
+    config_.getProperty( "unloadSDL", unloadSDL );
+    if ( unloadSDL )
+    {
+        freeGraphicsMemory();
+    }
     // If on MacOS disable relative mouse mode to handoff mouse to game/program
     #ifdef __APPLE__
         SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -185,8 +189,13 @@ void RetroFE::launchEnter( )
 // Return from the launch of a game/program
 void RetroFE::launchExit( )
 {
-    // Optionally set up SDL, and load the textures
-    //allocateGraphicsMemory();
+    // Set up SDL, and load the textures if unloadSDL flag is set
+    bool unloadSDL = false;
+    config_.getProperty( "unloadSDL", unloadSDL );
+    if ( unloadSDL )
+    {
+        allocateGraphicsMemory();
+    }
 
     // Restore the SDL settings
     SDL_RestoreWindow( SDL::getWindow( 0 ) );
