@@ -229,25 +229,28 @@ void RetroFE::launchExit( )
 
 
 // Free the textures, and optionall take down SDL
-void RetroFE::freeGraphicsMemory( )
+void RetroFE::freeGraphicsMemory()
 {
-
     // Free textures
-    if ( currentPage_ )
+    if (currentPage_)
     {
-        currentPage_->freeGraphicsMemory( );
+        currentPage_->freeGraphicsMemory();
     }
 
     // Close down SDL
     bool unloadSDL = false;
-    config_.getProperty( "unloadSDL", unloadSDL );
-    if ( unloadSDL )
+    config_.getProperty("unloadSDL", unloadSDL);
+    if (unloadSDL)
     {
-        currentPage_->deInitializeFonts( );
-        SDL::deInitialize( );
-        input_.clearJoysticks( );
-    }
+        // Ensure currentPage_ is not null before calling deInitializeFonts
+        if (currentPage_)
+        {
+            currentPage_->deInitializeFonts();
+        }
 
+        SDL::deInitialize();
+        input_.clearJoysticks();
+    }
 }
 
 
